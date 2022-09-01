@@ -9,7 +9,20 @@
       >
         ApiTest
       </a>
-
+    <h2>userInfo</h2>
+      <a
+        href="/#/userInfo"
+        target="_blank"
+      >
+        user_info
+      </a>
+      <h2>joinTest</h2>
+      <a
+        href="/#/joinTest"
+        target="joinTest"
+      >
+        joinTest
+      </a>
     <h2>Essential Links</h2>
     <ul>
       <li>

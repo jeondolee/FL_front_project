@@ -21,9 +21,9 @@ export default {
   },
   methods: {
     async api_event () {
-      const {data} = await axios.get('http://localhost:3010/api/getTest1')
+      const {data} = await axios.get('http://localhost:3010/api/PostgreDataTest/member')
       console.log('들어옴')
-      this.apiResult = data
+      this.apiResult = data // 들어오는 return을 먹난다
     }
   }
 }
