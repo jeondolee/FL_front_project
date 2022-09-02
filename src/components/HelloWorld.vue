@@ -14,7 +14,14 @@
         href="/#/userInfo"
         target="_blank"
       >
-        user_info
+        userInfo
+      </a>
+      <h2>visualData</h2>
+      <a
+        href="/#/visualData"
+        target="_blank"
+      >
+        visualData
       </a>
       <h2>joinTest</h2>
       <a

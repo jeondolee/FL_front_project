@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import ApiTest from '@/components/ApiTest'
 import userInfo from '@/components/userInfo'
 import joinTest from '@/components/joinTest'
+import visualData from '@/components/visualData'
 
 Vue.use(Router)
 
@@ -28,6 +29,12 @@ export default new Router({
       path: '/joinTest',
       name: 'joinTest',
       component: joinTest
+    },
+    {
+      path: '/visualData',
+      name: 'visualData',
+      component: visualData
     }
+
   ]
 })
