@@ -9,6 +9,13 @@
       >
         ApiTest
       </a>
+    <h2>pythonImg</h2>
+      <a
+        href="/#/pythonImg"
+        target="_blank"
+      >
+      pythonImg
+      </a>
     <h2>userInfo</h2>
       <a
         href="/#/userInfo"

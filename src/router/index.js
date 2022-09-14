@@ -5,6 +5,8 @@ import ApiTest from '@/components/ApiTest'
 import userInfo from '@/components/userInfo'
 import joinTest from '@/components/joinTest'
 import visualData from '@/components/visualData'
+import pythonImg from '@/components/pythonImg'
+// import { GChart } from 'vue-google-charts/legacy'
 
 Vue.use(Router)
 
@@ -14,6 +16,11 @@ export default new Router({
       path: '/',
       name: 'HelloWorld',
       component: HelloWorld
+    },
+    {
+      path: '/pythonImg',
+      name: 'pythonImg',
+      component: pythonImg
     },
     {
       path: '/ApiTest',
