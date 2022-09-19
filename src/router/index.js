@@ -6,6 +6,7 @@ import userInfo from '@/components/userInfo'
 import joinTest from '@/components/joinTest'
 import visualData from '@/components/visualData'
 import pythonImg from '@/components/pythonImg'
+
 // import { GChart } from 'vue-google-charts/legacy'
 
 Vue.use(Router)

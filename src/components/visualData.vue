@@ -6,17 +6,41 @@
 
  <template>
   <div>
-    <h1>input</h1>
-    <select v-model="selected" multiple>
-      <option :value="{comp_id: 'A'}">A</option>
-      <option :value="{comp_id: 'B'}">B</option>
-      <option :value="{comp_id: 'D'}">D</option>
-      <option :value="{comp_id: 'E'}">E</option>
-      <option :value="{comp_id: 'G'}">G</option>
-      <option :value="{comp_id: 'O'}">O</option>
-    </select>
+      <h1>select type</h1>
+      <select v-model="selected" multiple>
+        <option :value="{comp_id: 'A'}">A</option>
+        <option :value="{comp_id: 'B'}">B</option>
+        <option :value="{comp_id: 'D'}">D</option>
+        <option :value="{comp_id: 'E'}">E</option>
+        <option :value="{comp_id: 'G'}">G</option>
+        <option :value="{comp_id: 'O'}">O</option>
+      </select>
     {{selected}}
-    <button v-on:click="visual_comp()">visual_comp</button>
+    <button v-on:click="date()">date</button>
+
+    <div>
+      <table style ="margin : auto">
+        <th>From</th>
+        <th>To</th>
+        <tr>
+            <td>{{fromDate.from | yyyyMMdd}}</td>
+            <td>{{toDate.to-1 | yyyyMMdd}}</td>
+        </tr>
+        <tr>
+            <td><month-picker-input @change="SelectFrom"></month-picker-input></td>
+            <td><month-picker-input @change="SelectTo"></month-picker-input></td>
+        </tr>
+        <tr>
+            <td>{{fromDate.year}}-{{fromDate.month}}</td>
+            <td>{{toDate.year}}-{{toDate.month}}</td>
+        </tr>
+        <!-- <tr>
+            <td>from</td>
+            <td>to</td>
+        </tr> -->
+
+      </table>
+    </div>
     <template v-if="loaded">
       <div id="visual">
         <GChart
@@ -25,29 +49,24 @@
         :options="chartOptions"
         />
       </div>
+      <!-- <p> {{chartData}} </p> -->
     </template>
-    <p> {{chartData}} </p>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import { GChart } from 'vue-google-charts/legacy'// vue2에서는 legacy 붙혀서 사용
+import { GChart } from 'vue-google-charts/legacy'// vue2에서는 legacy 붙혀서 사용. 영어 문서 읽는 것 정말 중요하구나...
+import { MonthPickerInput } from 'vue-month-picker'
 
 // ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 export default {
   name: 'visual',
-  components: { GChart },
+  components: { GChart, MonthPickerInput },
   data () {
     // 변수 선언 공간
     return {
-      // 아마 항목, 데이터 순으로 와야 하는 것 같음
-      // 그렇다면 불러온 데이터 형식에 맞게 가공 필요
-      // ID 선택하면 밑이 년도(...월?), Bar는 cnt 평균값 나오게 뽑아볼까
-      // 정규식을 뽑자면(일단 끊기?) ... 백엔드에서 끊어서 보내자
-      // 1. "date_t": 이후로 네 자리(년도)
-      // 2. "total_cnt": " 이후로 숫자
       chartData: [
         ['Year', 'Sales', 'Expenses', 'Profit'],
         ['2014', 1000, 400, 200],
@@ -55,17 +74,42 @@ export default {
         ['2016', 660, 1120, 300],
         ['2017', 1030, 540, 350]
       ],
-      // chartOptions: {
-      //   chart: {
-      //     title: 'Company Performance',
-      //     subtitle: 'Sales, Expenses, Profit: 2014-2017'
-      //   }
-      // },
+      fromDate: {
+        from: null,
+        to: null,
+        month: null,
+        year: null
+      },
+      toDate: {
+        from: null,
+        to: null,
+        month: null,
+        year: null
+      },
       apiResult: 'empty',
       date_t: '',
       comp_id: '',
       total_cnt: '',
       selected: ''
+    }
+  },
+  filters: {
+    yyyyMMdd: function (value) {
+      if (value === '') return ''
+      var jsDate = new Date(value)
+
+      var year = jsDate.getFullYear()
+      var month = jsDate.getMonth() + 1
+      var day = jsDate.getDate()
+
+      if (month < 10) {
+        month = '0' + month
+      }
+      if (day < 10) {
+        day = '0' + day
+      }
+
+      return year + '-' + month + '-' + day
     }
   },
   methods: {
@@ -83,6 +127,51 @@ export default {
 
       this.chartData = data // 결과값 받아와서 api result에 주기
       this.loaded = true
+    },
+    async date () {
+      if (this.toData.to < this.fromData.from) {
+        document.write(Date(this.toData.to))
+        window.alert('Worng input')
+        return
+      }
+
+      var address = 'http://localhost:3010/api/visual/date'
+
+      let condition = {
+        comp_id: this.selected[0].comp_id,
+        fromDate: this.fromDate.from,
+        toDate: this.toDate.to - 1
+      }
+
+      const {data} = await axios.post(address, condition)
+
+      this.chartData = data // 결과값 받아와서 api result에 주기
+      this.loaded = true
+    },
+    SelectFrom (date) {
+      this.fromDate = date
+    },
+    SelectTo (date) {
+      this.toDate = date
+    },
+    month (value) {
+      if (value === '') return ''
+
+      var jsDate = new Date(value)
+
+      var year = jsDate.getFullYear()
+      var month = jsDate.getMonth()
+      var day = jsDate.getDate()
+
+      if (month < 10) {
+        month = '0' + month
+      }
+
+      if (day < 10) {
+        day = '0' + day
+      }
+
+      return year + '-' + month + '-' + day
     }
   }
 }
