@@ -6,6 +6,7 @@ import userInfo from '@/components/userInfo'
 import joinTest from '@/components/joinTest'
 import visualData from '@/components/visualData'
 import pythonImg from '@/components/pythonImg'
+import board from '@/components/board'
 
 // import { GChart } from 'vue-google-charts/legacy'
 
@@ -42,7 +43,11 @@ export default new Router({
       path: '/visualData',
       name: 'visualData',
       component: visualData
+    },
+    {
+      path: '/board',
+      name: 'board',
+      component: board
     }
-
   ]
 })

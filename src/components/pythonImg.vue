@@ -9,7 +9,6 @@
     <div>
       <b-img :src="previewImageData"></b-img>
     </div>
-    <br></br>
     <input v-model = "name" placeholder="name">
     <button @click.stop="apievent()">요청</button><br /><br />
     <h3>Api 요청 결과 값 : {{ apiresult }}</h3>
