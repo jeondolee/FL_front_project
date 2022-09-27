@@ -28,7 +28,7 @@
       <div>
         <h3 v-if=showInsert >Insert</h3>
       </div>
-        <b-table Edited v-if=showInsert bordered :items="itemsEdit" :fields="fieldsEdit" style="float: right;">
+        <b-table Insert v-if=showInsert bordered :items="itemsEdit" :fields="fieldsEdit" style="float: right;">
           <template v-if=showInsert slot='top-row' slot-scope="{ fieldsEdit }">
             <td>
               <b-form-input v-model="insertItem1" placeholder="입력해주세요"></b-form-input>
@@ -72,7 +72,8 @@
       </div>
 
     <div style="margin-top: 10px">
-      <b-table Clicked v-if=showData bordered :items="items" :fields="fields" ref="selectableTable" selectable @row-selected="onRowSelected">
+      <b-table Clicked v-if=showData bordered :items="items" :fields="fields" :select-mode="selectMode" responsive="sm"
+      ref="selectableTable" selectable @row-selected="onRowSelected">
         <template #cell(selected)="{ rowSelected }">
         <template v-if="rowSelected">
           <span aria-hidden="true">&check;</span>
@@ -83,17 +84,16 @@
           <span class="sr-only">Not selected</span>
         </template>
       </template>
-        <template v-slot:cell(button)>
-          <b-button variant="edit">edit</b-button>
-        </template>
       </b-table>
       <p>
       Selected Rows:<br>
       {{ selected }}
-    </p>
-    <p>{{apiResult }}</p>
+      </p>
+      <p>{{apiResult }}</p>
     </div>
+
   </div>
+
 </template>
 
 <script>
@@ -190,7 +190,6 @@ export default {
       if (this.showInsert === true) this.showInsert = false
       else this.showInsert = true
     },
-
     // slot에 edit, delete 버튼 추가하기
     // edit 버튼 누르면 위에 쭉 추가되기?
     // 변경시 리스트 정렬 유지는 모르겠다 그냥 새로 고침...
@@ -208,22 +207,27 @@ export default {
       var selID = []
       for (i = 0; i < this.selected.length; i++) {
         selID.push(this.selected[i].id)
+
+        var address = 'http://localhost:3010/api/board/del' + '?id=' + this.selected[i].id
+
+        console.log(address)
+
+        const { data } = await axios.get(address)
+        this.apiResult = data
       }
 
       this.selected = selID
 
-      var address = 'http://localhost:3010/api/board/del' + '?id=' + this.selected
+      console.log(selID)
 
-      console.log(address)
 
-      const { data } = await axios.get(address)
-      this.apiResult = data
+
       this.readData()
       this.readData()
     },
     // id 중복이 되면 수정 로직으로(추가되면 칸 비게 만들기), id 중복이 아니면 추가 로직으로
     async saveInsert () {
-      var address = 'http://localhost:3010/api/board/insert' + '?id=' + this.insertItem1 + '&=first_name' + this.insertItem2 + '&=last_name' + this.insertItem3 + '&=age' + this.insertItem4
+      var address = 'http://localhost:3010/api/board/insert' + '?id=' + this.insertItem1 + '&first_name=' + this.insertItem2 + '&last_name=' + this.insertItem3 + '&age=' + this.insertItem4
 
       console.log(address)
 
@@ -232,15 +236,19 @@ export default {
       this.readData()
       this.readData()
     },
-    saveEdit () {
-      this.items.push({ id: this.editItem1, first_name: this.editItem2, last_name: this.editItem3, age: this.editItem4 })
-      this.editItem1 = ''
-      this.editItem2 = ''
-      this.editItem3 = ''
-      this.editItem4 = ''
-      this.showEdit = false
-    }
+    async saveEdit () {
+      var address = 'http://localhost:3010/api/board/edit' + '?id=' + this.editItem1 + '&first_name=' + this.editItem2 + '&last_name=' + this.editItem3 + '&age=' + this.editItem4
 
+      console.log(address)
+
+      const { data } = await axios.get(address)
+      this.apiResult = data
+      this.readData()
+      this.readData()
+    },
+    onRowSelected (items) {
+      this.selected = items
+    }
   }
 }
 </script>
