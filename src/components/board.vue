@@ -7,13 +7,13 @@
 <template>
   <div>
     <h1>{{title}}</h1>
-    <div style="float: right; margin: 0px, 0px, 10px">
+    <div style="float: right; margin-top: 20px">
       <b-input-group>
         <b-input-group-prepend>
           <b-button v-on:click="readData()" variant="outline-primary">Read</b-button>
         </b-input-group-prepend>
         <b-input-group-prepend>
-          <b-button v-on:click="addData()" variant="outline-primary">Add</b-button>
+          <b-button v-on:click="addData()" variant="outline-primary">Create</b-button>
         </b-input-group-prepend>
         <b-input-group-prepend>
           <b-button v-on:click="editData()" variant="outline-primary">Edit</b-button>
@@ -21,14 +21,15 @@
         <b-input-group-prepend>
           <b-button v-on:click="deleteData()" variant="outline-primary">Delete</b-button>
         </b-input-group-prepend>
-        <b-input-group-prepend>
-          <b-button v-on:click="saveData()" variant="outline-primary">Save</b-button>
-        </b-input-group-prepend>
       </b-input-group>
     </div>
-    <div>
-        <b-table Clicked v-if=showData bordered :items="items" :fields="fields">
-          <template v-if=showInsert slot='top-row' slot-scope="{ fields }">
+    <!-- Insert -->
+    <div style="margin-top: 20px">
+      <div>
+        <h3 v-if=showInsert >Insert</h3>
+      </div>
+        <b-table Edited v-if=showInsert bordered :items="itemsEdit" :fields="fieldsEdit" style="float: right;">
+          <template v-if=showInsert slot='top-row' slot-scope="{ fieldsEdit }">
             <td>
               <b-form-input v-model="insertItem1" placeholder="입력해주세요"></b-form-input>
             </td>
@@ -38,9 +39,60 @@
             <td>
               <b-form-input v-model="insertItem3" placeholder="입력해주세요"></b-form-input>
             </td>
+            <td>
+              <b-form-input v-model="insertItem4" placeholder="입력해주세요"></b-form-input>
+            </td>
           </template>
         </b-table>
+            <b-button v-if=showInsert v-on:click="saveInsert()" variant="outline-primary" style="float: right; margin-top: -15px">Confirm</b-button>
       </div>
+    <!-- edit -->
+    <div style="margin-top: 20px">
+      <div>
+        <h3 v-if=showEdit >Edit</h3>
+      </div>
+        <b-table Edited v-if=showEdit bordered :items="itemsEdit" :fields="fieldsEdit" style="float: right;">
+          <!-- items 빈거 하나 넣어서 해도 되지않을까? -->
+          <template v-if=showEdit slot='top-row' slot-scope="{ fieldsEdit }">
+            <td>
+              <b-form-input v-model="editItem1" placeholder="입력해주세요"></b-form-input>
+            </td>
+            <td>
+              <b-form-input v-model="editItem2" placeholder="입력해주세요"></b-form-input>
+            </td>
+            <td>
+              <b-form-input v-model="editItem3" placeholder="입력해주세요"></b-form-input>
+            </td>
+            <td>
+              <b-form-input v-model="editItem4" placeholder="입력해주세요"></b-form-input>
+            </td>
+          </template>
+        </b-table>
+            <b-button v-if=showEdit v-on:click="saveEdit()" variant="outline-primary" style="float: right; margin-top: -15px">Confirm</b-button>
+      </div>
+
+    <div style="margin-top: 10px">
+      <b-table Clicked v-if=showData bordered :items="items" :fields="fields" ref="selectableTable" selectable @row-selected="onRowSelected">
+        <template #cell(selected)="{ rowSelected }">
+        <template v-if="rowSelected">
+          <span aria-hidden="true">&check;</span>
+          <span class="sr-only">Selected</span>
+        </template>
+        <template v-else>
+          <span aria-hidden="true">&nbsp;</span>
+          <span class="sr-only">Not selected</span>
+        </template>
+      </template>
+        <template v-slot:cell(button)>
+          <b-button variant="edit">edit</b-button>
+        </template>
+      </b-table>
+      <p>
+      Selected Rows:<br>
+      {{ selected }}
+    </p>
+    <p>{{apiResult }}</p>
+    </div>
   </div>
 </template>
 
@@ -54,84 +106,141 @@ export default {
 
   data () {
     return {
+      selectMode: 'multi',
+      selected: [],
+
       title: 'Board',
       apiResult: 'empty',
       showData: false,
+      showEdit: false,
       showInsert: false,
       insertItem1: '',
       insertItem2: '',
       insertItem3: '',
+      insertItem4: '',
+      fieldsEdit: [
+        {
+          key: 'id',
+          label: '#'
+        },
+        {
+          key: 'last_name'
+        },
+        {
+          key: 'first_name'
+        },
+        {
+          key: 'age',
+          label: 'Person age'
+          // Variant applies to the whole column, including the header and footer
+          // variant: 'danger'
+        }
+      ],
       fields: [
+        {
+          key: 'selected',
+          label: 'sel'
+        },
+        {
+          key: 'id',
+          label: '#',
+          sortable: true
+        },
         {
           key: 'last_name',
           sortable: true
         },
         {
           key: 'first_name',
-          sortable: false
+          sortable: true
         },
         {
           key: 'age',
-          label: 'Person age',
+          label: 'age',
           sortable: true
           // Variant applies to the whole column, including the header and footer
           // variant: 'danger'
+        },
+        {
+          key: 'button',
+          label: 'btn'
         }
       ],
       items: [
-        { isActive: true, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-        { isActive: true, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-        { isActive: false, age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-        { isActive: false, age: 38, first_name: 'Jami', last_name: 'Carney' }
+        { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
+        { id: 2, age: 21, first_name: 'Larsen', last_name: 'Shaw' }
+      ],
+      itemsEdit: [
       ]
     }
   },
   methods: {
-    async date () {
-      if (this.toData.to < this.fromData.from) {
-        document.write(Date(this.toData.to))
-        window.alert('Worng input')
-        return
-      }
+    async readData () {
+      if (this.showData === true) this.showData = false
+      else this.showData = true
 
-      var address = 'http://localhost:3010/api/visual/date'
+      var address = 'http://localhost:3010/api/board/read'
 
-      let condition = {
-        comp_id: this.selected[0].comp_id,
-        fromDate: this.fromDate.from,
-        toDate: this.toDate.to - 1
-      }
-
-      const { data } = await axios.post(address, condition)
-
-      this.chartData = data // 결과값 받아와서 api result에 주기
-      this.loaded = true
+      const { data } = await axios.get(address)
+      console.log(data)
+      this.items = data
     },
     // add 하면 상단 insert영역 보이게 하기, 다시 누르면 안보이게(save 버튼 포함)
     addData () {
-      this.showInsert = true
+      if (this.showInsert === true) this.showInsert = false
+      else this.showInsert = true
     },
-    // read는 딱히 의미x(DB한다면 새로고침)
-    readData () {
-      this.showData = true
-    },
+
+    // slot에 edit, delete 버튼 추가하기
+    // edit 버튼 누르면 위에 쭉 추가되기?
+    // 변경시 리스트 정렬 유지는 모르겠다 그냥 새로 고침...
+
     // row 지정하면 insert box 출력? => 이런 기능은 없을 듯, 원래 값은 placehold
     // 쉽게 하려면 index 지정하고 add, delete 하면 되는데...
     // add와 달리 index 입력 칸을 추가하자
     editData () {
-
+      if (this.showEdit === true) this.showEdit = false
+      else this.showEdit = true
     },
-    // delete는 체크박스? 클릭하면 색깔 남는 효과 주고 바로 지워지게 하는게 낫지 않나
-    deleteData () {
+    // delete는 체크박스 클릭 후 삭제 되게끔
+    async deleteData () {
+      var i = 0
+      var selID = []
+      for (i = 0; i < this.selected.length; i++) {
+        selID.push(this.selected[i].id)
+      }
 
+      this.selected = selID
+
+      var address = 'http://localhost:3010/api/board/del' + '?id=' + this.selected
+
+      console.log(address)
+
+      const { data } = await axios.get(address)
+      this.apiResult = data
+      this.readData()
+      this.readData()
     },
-    saveData () {
-      this.items.push({ age: this.insertItem1, first_name: this.insertItem2, last_name: this.insertItem3 })
-      this.insertItem1 = ''
-      this.insertItem2 = ''
-      this.insertItem3 = ''
-      this.showInsert = false
+    // id 중복이 되면 수정 로직으로(추가되면 칸 비게 만들기), id 중복이 아니면 추가 로직으로
+    async saveInsert () {
+      var address = 'http://localhost:3010/api/board/insert' + '?id=' + this.insertItem1 + '&=first_name' + this.insertItem2 + '&=last_name' + this.insertItem3 + '&=age' + this.insertItem4
+
+      console.log(address)
+
+      const { data } = await axios.get(address)
+      this.apiResult = data
+      this.readData()
+      this.readData()
+    },
+    saveEdit () {
+      this.items.push({ id: this.editItem1, first_name: this.editItem2, last_name: this.editItem3, age: this.editItem4 })
+      this.editItem1 = ''
+      this.editItem2 = ''
+      this.editItem3 = ''
+      this.editItem4 = ''
+      this.showEdit = false
     }
+
   }
 }
 </script>
